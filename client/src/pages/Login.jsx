@@ -58,22 +58,26 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">Email</label>
             <input 
+              id="email"
               type="email" 
               required 
               value={email}
+              autoComplete="email"
               onChange={e => setEmail(e.target.value)}
               className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
               placeholder="athlete@rivalrise.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">Password</label>
             <input 
+              id="password"
               type="password" 
               required 
               value={password}
+              autoComplete="current-password"
               onChange={e => setPassword(e.target.value)}
               className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
               placeholder="••••••••"
