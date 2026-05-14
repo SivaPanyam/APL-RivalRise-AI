@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Function to check if user is logged in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Function to check if user is an admin
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // USERS
+    match /users/{userId} {
+      allow read: if isAuthenticated(); // Anyone can read basic profile info (e.g. for leaderboards)
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // MISSIONS
+    match /missions/{missionId} {
+      allow read: if isAuthenticated();
+      // Only the user or backend can create/update missions.
+      // (For tighter security, updates to XP/status should only be done via secure backend functions)
+      allow create, update: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // TOURNAMENTS
+    match /tournaments/{tournamentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // PREDICTIONS
+    match /predictions/{predictionId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isOwner(request.resource.data.userId);
+      allow update: if isAdmin(); // Only backend resolves predictions
+      allow delete: if isAdmin();
+    }
+
+    // REWARDS
+    match /rewards/{rewardId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // STREAKS
+    match /streaks/{streakId} {
+      allow read: if isOwner(resource.data.userId);
+      // Streak updates should ideally happen via backend functions to prevent cheating
+      allow write: if isAdmin(); 
+    }
+
+    // LEADERBOARD
+    // Usually a view over users, but if a separate collection:
+    match /leaderboard/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // AI_PROFILES
+    match /aiProfiles/{profileId} {
+      allow read: if isOwner(resource.data.userId);
+      allow write: if isOwner(request.resource.data.userId);
+    }
+
+    // ENGAGEMENT_HISTORY
+    match /engagementHistory/{eventId} {
+      allow create: if isOwner(request.resource.data.userId);
+      allow read, update, delete: if isAdmin(); // Used for analytics
+    }
+
+    // NOTIFICATIONS
+    match /notifications/{notificationId} {
+      allow read, update: if isOwner(resource.data.userId); // Read and mark as read
+      allow create, delete: if isAdmin();
+    }
+  }
+}
