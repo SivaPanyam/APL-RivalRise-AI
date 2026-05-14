@@ -23,3 +23,8 @@ export const hoverGlow = {
   rest: { boxShadow: "0px 0px 0px rgba(14, 165, 233, 0)" },
   hover: { boxShadow: "0px 0px 15px rgba(14, 165, 233, 0.5)", transition: { duration: 0.3 } }
 };
+
+export const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 }
+};
