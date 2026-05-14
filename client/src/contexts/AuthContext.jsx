@@ -83,9 +83,20 @@ export function AuthProvider({ children }) {
         setCurrentUser(user);
         if (user) {
           const userDocRef = doc(db, 'users', user.uid);
-          const docSnap = await getDoc(userDocRef);
-          if (docSnap.exists()) {
-            setUserData(docSnap.data());
+          // Use a promise race to timeout if Firestore is slow
+          const fetchDoc = getDoc(userDocRef);
+          const timeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Firestore timeout')), 5000)
+          );
+
+          try {
+            const docSnap = await Promise.race([fetchDoc, timeout]);
+            if (docSnap.exists()) {
+              setUserData(docSnap.data());
+            }
+          } catch (e) {
+            console.warn("Firestore fetch timed out or failed:", e.message);
+            // We proceed even if fetch fails; the components will handle empty userData
           }
         } else {
           setUserData(null);
