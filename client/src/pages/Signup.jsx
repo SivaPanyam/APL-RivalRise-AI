@@ -18,7 +18,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signup(email, password, username);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError('Failed to create account. ' + err.message);
     } finally {
@@ -31,7 +31,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await loginWithGoogle();
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError('Failed to sign in with Google.');
     } finally {

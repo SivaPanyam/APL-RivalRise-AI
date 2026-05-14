@@ -1,6 +1,6 @@
 # RivalRise AI: The Intelligent Esports Engagement Platform
 
-[![Built with Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blueviolet?style=for-the-badge)](https://ai.google.dev/)
+[![Built with Gemini](https://img.shields.io/badge/AI-Gemini%201.5%20Flash-blueviolet?style=for-the-badge)](https://ai.google.dev/)
 [![Built with Firebase](https://img.shields.io/badge/Backend-Firebase%20%26%20Node.js-orange?style=for-the-badge)](https://firebase.google.com/)
 [![Docker Ready](https://img.shields.io/badge/Deployment-Docker%20%26%20Cloud%20Run-blue?style=for-the-badge)](https://cloud.google.com/run)
 

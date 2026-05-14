@@ -1,15 +1,7 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const { getModel } = require('../config/ai');
 
 const generateSmartAlert = async (userContext, eventType) => {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is missing');
-  }
-
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    systemInstruction: `You are the AI Notification Engine for RivalRise, a competitive sports/esports gamification platform.
+  const systemInstruction = `You are the AI Notification Engine for RivalRise, a competitive sports/esports gamification platform.
 Your job is to generate a short, punchy, and highly personalized push notification message for a user.
 
 Event Types:
@@ -27,8 +19,9 @@ Example output:
 {
   "title": "Your Streak is in Danger! ⚠️",
   "body": "Tactician, log in now to lock in your Day 5 streak before you lose your momentum."
-}`,
-  });
+}`;
+
+  const model = getModel(systemInstruction);
 
   const prompt = `Generate a "${eventType}" notification for this user:
 Username: ${userContext.username || 'Fan'}
@@ -37,15 +30,20 @@ Current Streak: ${userContext.streak || 0}
 Archetype: ${userContext.archetype || 'Loyal Supporter'}`;
 
   try {
-    const result = await model.generateContent({
+    const request = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json",
       }
-    });
+    };
 
-    const text = result.response.text();
-    return JSON.parse(text);
+    const result = await model.generateContent(request);
+    const response = await result.response;
+    const text = response.candidates[0].content.parts[0].text;
+    
+    // Clean up potential markdown code blocks
+    const jsonText = text.replace(/^```json/i, '').replace(/```$/i, '').trim();
+    return JSON.parse(jsonText);
   } catch (error) {
     console.error('Error generating smart notification:', error);
     // Fallback static notification

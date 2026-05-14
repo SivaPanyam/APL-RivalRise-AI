@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Trophy, Target, LogOut, Swords, Medal, Bot, Gift, User } from 'lucide-react';
+import { Trophy, Target, LogOut, Swords, Medal, Bot, Gift, User, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Navbar() {

@@ -67,9 +67,7 @@ export function AuthProvider({ children }) {
   }
 
   async function loginWithGoogle() {
-    const userCredential = await signInWithPopup(auth, googleProvider);
-    await initializeUserInDB(userCredential.user);
-    return userCredential;
+    return signInWithPopup(auth, googleProvider);
   }
 
   function logout() {
@@ -83,20 +81,22 @@ export function AuthProvider({ children }) {
         setCurrentUser(user);
         if (user) {
           const userDocRef = doc(db, 'users', user.uid);
-          // Use a promise race to timeout if Firestore is slow
-          const fetchDoc = getDoc(userDocRef);
-          const timeout = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Firestore timeout')), 5000)
-          );
-
-          try {
-            const docSnap = await Promise.race([fetchDoc, timeout]);
-            if (docSnap.exists()) {
-              setUserData(docSnap.data());
-            }
-          } catch (e) {
-            console.warn("Firestore fetch timed out or failed:", e.message);
-            // We proceed even if fetch fails; the components will handle empty userData
+          const docSnap = await getDoc(userDocRef);
+          
+          if (docSnap.exists()) {
+            const existingData = docSnap.data();
+            setUserData(existingData);
+            
+            // Handle streak logic
+            const StreakService = (await import('../services/streakService')).default;
+            await StreakService.evaluateDailyLogin(user.uid, existingData);
+            
+            // Refresh data after streak evaluation
+            const updatedSnap = await getDoc(userDocRef);
+            setUserData(updatedSnap.data());
+          } else {
+            // New user (like Google Sign-in for the first time)
+            await initializeUserInDB(user);
           }
         } else {
           setUserData(null);

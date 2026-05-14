@@ -1,8 +1,19 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { pageVariants } from '../animations/variants';
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from 'react';
 
 export default function Landing() {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/dashboard');
+    }
+  }, [currentUser, navigate]);
+
   return (
     <motion.div 
       variants={pageVariants}

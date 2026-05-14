@@ -1,7 +1,5 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { getModel, aiClient } = require('../config/ai');
 const identityEngine = require('../ai/identityEngine');
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const analyzeIdentity = async (req, res) => {
   try {
@@ -52,13 +50,15 @@ const chatWithCoach = async (req, res) => {
       4. Format your response cleanly using markdown if needed.
     `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = getModel(systemInstruction);
 
-    // Combine system instruction and user prompt
-    const fullPrompt = `${systemInstruction}\n\nUser Question: ${prompt}`;
+    const request = {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    };
 
-    const result = await model.generateContent(fullPrompt);
-    const text = result.response.text();
+    const result = await model.generateContent(request);
+    const response = await result.response;
+    const text = response.candidates[0].content.parts[0].text;
 
     res.status(200).json({
       success: true,

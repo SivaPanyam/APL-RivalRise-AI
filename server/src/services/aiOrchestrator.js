@@ -2,7 +2,7 @@ const { aiClient } = require('../config/ai');
 
 class AIOrchestrator {
   /**
-   * General purpose method to interact with Gemini
+   * General purpose method to interact with Gemini via Vertex AI
    * @param {string} prompt - The prompt to send
    * @param {Object} options - Configuration for the generation
    */
@@ -12,8 +12,10 @@ class AIOrchestrator {
     }
 
     try {
-      const model = aiClient.getGenerativeModel({ 
-        model: options.model || "gemini-1.5-flash",
+      // For Vertex AI, aiClient is already the model instance
+      // We pass the generation configuration to generateContent
+      const request = {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: options.temperature || 0.7,
           topP: options.topP || 0.8,
@@ -21,15 +23,20 @@ class AIOrchestrator {
           maxOutputTokens: options.maxTokens || 1024,
           responseMimeType: options.json ? "application/json" : "text/plain",
         }
-      });
+      };
 
-      const result = await model.generateContent(prompt);
+      const result = await aiClient.generateContent(request);
       const response = await result.response;
-      const text = response.text();
+      
+      // In Vertex AI SDK, candidates[0].content.parts[0].text is the common way
+      // but response.text() is often available in newer versions
+      const text = response.candidates[0].content.parts[0].text;
 
       if (options.json) {
         try {
-          return JSON.parse(text);
+          // Clean up potential markdown code blocks
+          const jsonText = text.replace(/^```json/i, '').replace(/```$/i, '').trim();
+          return JSON.parse(jsonText);
         } catch (e) {
           console.error("Failed to parse AI JSON response", text);
           throw new Error("Invalid AI Response Format");
@@ -94,10 +101,13 @@ class AIOrchestrator {
       
       Return a JSON object with:
       - title: (Short exciting mission title)
-      - objective: (1 sentence goal, e.g., "Make 3 correct predictions in the Cyber Cup")
-      - rewardXp: (Number, 100-500)
-      - rewardCoins: (Number, 20-100)
+      - description: (1-2 sentence goal, e.g., "Make 3 correct predictions in the Cyber Cup")
+      - xpReward: (Number, 100-500)
+      - coinReward: (Number, 20-100)
       - difficulty: (Easy, Medium, Hard)
+      - target: (Number, usually 3-10 depending on difficulty)
+      - progress: 0
+      - aiMessage: (A short encouraging message from the AI Coach)
     `;
 
     return await this.generateResponse(prompt, { json: true });

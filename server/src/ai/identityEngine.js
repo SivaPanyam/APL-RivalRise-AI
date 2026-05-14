@@ -1,11 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { aiClient } = require('../config/ai');
 
 class IdentityEngine {
-  constructor() {
-    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-  }
-
   async analyzeFan(userData, predictions) {
     const prompt = `
       You are the "AI Identity Assessor" for an esports engagement platform called RivalRise AI.
@@ -34,15 +29,20 @@ class IdentityEngine {
     `;
 
     try {
-      const result = await this.model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+      const request = {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: "application/json",
         }
-      });
+      };
+
+      const result = await aiClient.generateContent(request);
+      const response = await result.response;
+      const text = response.candidates[0].content.parts[0].text;
       
-      const responseText = result.response.text();
-      return JSON.parse(responseText);
+      // Clean up potential markdown code blocks
+      const jsonText = text.replace(/^```json/i, '').replace(/```$/i, '').trim();
+      return JSON.parse(jsonText);
     } catch (error) {
       console.error("[IdentityEngine] Failed to generate identity:", error);
       // Fallback response in case of API failure

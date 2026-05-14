@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 // Initialize Logger
 logger(app);
 
-app.use(cors());
+app.use(cors({origin: '*'}));
 app.use(express.json());
 
 // Serve static frontend files

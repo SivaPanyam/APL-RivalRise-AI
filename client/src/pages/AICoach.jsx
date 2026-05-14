@@ -212,7 +212,7 @@ export default function AICoach() {
             </button>
           </div>
           <div className="text-center mt-2">
-             <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Powered by Google Gemini 2.5 Flash</span>
+             <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Powered by Google Gemini 1.5 Flash</span>
           </div>
         </div>
       </div>
