@@ -42,8 +42,8 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Catch-all route to serve React app
-app.get('/:path*', (req, res) => {
+// Catch-all to serve React app for any non-API routes
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
