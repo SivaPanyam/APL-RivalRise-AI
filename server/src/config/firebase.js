@@ -1,8 +1,10 @@
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin (mocked for local dev, replace with real credentials or default in Cloud Run)
-// admin.initializeApp({
-//   credential: admin.credential.applicationDefault()
-// });
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+  admin.initializeApp({
+    projectId: "fanverse-ai-c706e"
+  });
+}
 
 module.exports = { admin };

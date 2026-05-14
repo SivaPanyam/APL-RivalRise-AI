@@ -3,12 +3,13 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "mock_api_key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "mock-app.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "mock-app",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "mock-app.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:abcdef"
+  apiKey: "AIzaSyAdKV21ZvrXfAQYuJD6YxFuOwOrqtF6xck",
+  authDomain: "fanverse-ai-c706e.firebaseapp.com",
+  projectId: "fanverse-ai-c706e",
+  storageBucket: "fanverse-ai-c706e.firebasestorage.app",
+  messagingSenderId: "223349418431",
+  appId: "1:223349418431:web:123aa24631acd6e067d90a",
+  measurementId: "G-E9PXPZJ98W"
 };
 
 const app = initializeApp(firebaseConfig);
